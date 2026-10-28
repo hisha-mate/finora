@@ -2,6 +2,7 @@
 import os
 import re
 import sqlite3
+from contextlib import contextmanager
 from datetime import date, datetime
 from functools import wraps
 from io import BytesIO
@@ -21,6 +22,10 @@ app.config["SECRET_KEY"] = (
     or "dev-only-change-this-key"
 )
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+if os.environ.get("SESSION_COOKIE_SECURE", "0").lower() in ("true", "1"):
+    app.config["SESSION_COOKIE_SECURE"] = True
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("DATABASE_PATH", os.path.join(BASE_DIR, "finora.db"))
@@ -35,15 +40,25 @@ CATEGORIES = [
 ]
 
 
+@contextmanager
 def get_db():
-    db = sqlite3.connect(DB_PATH)
+    db = sqlite3.connect(DB_PATH, timeout=30.0)
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA foreign_keys = ON")
-    return db
+    try:
+        yield db
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
 
 
 def init_db():
     with get_db() as db:
+        db.execute("PRAGMA journal_mode = WAL")
+        db.execute("PRAGMA synchronous = NORMAL")
         db.executescript("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -159,6 +174,15 @@ def summary_data(user_id):
         "savings_rate": round(savings_rate, 1),
         "health_score": score
     }
+
+
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "healthy",
+        "app": "Finora",
+        "timestamp": datetime.utcnow().isoformat()
+    }), 200
 
 
 @app.route("/")

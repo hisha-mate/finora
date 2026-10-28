@@ -25,5 +25,9 @@ RUN mkdir -p uploads
 # Expose default port
 EXPOSE 5000
 
-# Start production server using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--threads", "4", "--timeout", "60", "app:app"]
+# Docker healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request, os; port = os.environ.get('PORT', '5000'); urllib.request.urlopen(f'http://localhost:{port}/health')" || exit 1
+
+# Start production server using Gunicorn (automatically reads gunicorn.conf.py)
+CMD ["gunicorn", "app:app"]
