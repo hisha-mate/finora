@@ -1,0 +1,60 @@
+
+{% extends "base.html" %}
+{% block title %}{{ 'Create account' if mode == 'signup' else 'Welcome back' }}{% endblock %}
+{% block auth_content %}
+<div class="auth-page">
+    <div class="auth-decoration">
+        <a class="brand" href="{{ url_for('home') }}">
+            <span class="brand-icon">f</span> finora<span class="brand-dot">.</span>
+        </a>
+        <div class="auth-message">
+            <span class="eyebrow">YOUR MONEY, UNDERSTOOD</span>
+            <h1>Make your money<br>work <span>for you.</span></h1>
+            <p>Less financial confusion. More clarity, confidence, and control.</p>
+            <div class="decor-card">
+                <span class="decor-icon">↗</span>
+                <div><small>Your financial journey</small><h3>Starts with one step.</h3></div>
+            </div>
+        </div>
+        <div class="auth-orb orb-one"></div>
+        <div class="auth-orb orb-two"></div>
+    </div>
+
+    <div class="auth-form-wrap">
+        <form class="auth-card" method="POST"
+              action="{{ url_for('signup' if mode == 'signup' else 'login') }}">
+            <span class="eyebrow">{{ 'GET STARTED' if mode == 'signup' else 'WELCOME BACK' }}</span>
+            <h2>{{ 'Create your account' if mode == 'signup' else 'Sign in to Finora' }}</h2>
+            <p class="muted">{{ 'A clearer relationship with money starts here.' if mode == 'signup' else 'Your financial overview is waiting for you.' }}</p>
+
+            {% if mode == 'signup' %}
+            <label for="name">Full name</label>
+            <input id="name" name="name" type="text" placeholder="Your name" required maxlength="100">
+            {% endif %}
+
+            <label for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required maxlength="254">
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password"
+                   placeholder="At least 8 characters" required minlength="8"
+                   autocomplete="{{ 'new-password' if mode == 'signup' else 'current-password' }}">
+
+            {% if mode == 'signup' %}
+            <p class="field-hint">Use at least 8 characters.</p>
+            {% endif %}
+
+            <button class="btn btn-primary btn-full" type="submit">
+                {{ 'Create my account →' if mode == 'signup' else 'Sign in →' }}
+            </button>
+            <p class="auth-switch">
+                {{ 'Already have an account?' if mode == 'signup' else "Don't have an account?" }}
+                <a href="{{ url_for('login' if mode == 'signup' else 'signup') }}">
+                    {{ 'Log in' if mode == 'signup' else 'Sign up' }}
+                </a>
+            </p>
+            <a class="back-home" href="{{ url_for('home') }}">← Back to home</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

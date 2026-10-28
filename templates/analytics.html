@@ -1,0 +1,39 @@
+
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block page_name %}Analytics{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">UNDERSTAND YOUR HABITS</span><h1>Financial analytics</h1><p class="muted">See your income, expenses, and spending patterns.</p></div></div>
+
+<div class="content-grid">
+    <section class="panel panel-wide">
+        <div class="panel-heading"><div><h3>Income vs. expenses</h3><p class="muted">Monthly comparison across recorded transactions</p></div></div>
+        <div class="chart-wrap chart-large"><canvas id="monthlyChart"></canvas></div>
+        <script type="application/json" id="monthlyData">{{ {
+            "labels": months,
+            "income": incomes,
+            "expenses": expenses
+        }|tojson }}</script>
+    </section>
+
+    <section class="panel">
+        <div class="panel-heading"><div><h3>Where money goes</h3><p class="muted">Expenses by category, all time</p></div></div>
+        {% if categories %}
+        <div class="chart-wrap"><canvas id="analyticsCategoryChart"></canvas></div>
+        <script type="application/json" id="analyticsCategoryData">{{ {
+            "labels": categories,
+            "values": category_totals
+        }|tojson }}</script>
+        {% else %}
+        <div class="empty-state"><p>Add expenses to see category analysis.</p></div>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h3>How to use your insights</h3>
+        <div class="insight-item"><span>✧</span><p>Compare months to identify increases in spending.</p></div>
+        <div class="insight-item"><span>✧</span><p>Set category budgets for expenses you can control.</p></div>
+        <div class="insight-item"><span>✧</span><p>Use savings goals to turn the money you save into progress.</p></div>
+    </section>
+</div>
+{% endblock %}

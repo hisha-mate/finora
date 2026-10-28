@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+Smart Insights | Finora
+{% endblock %}
+
+{% block page_heading %}
+Smart insights
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-intro">
+
+    <p>
+        Actionable observations generated from your
+        income, expenses and spending patterns.
+    </p>
+
+</div>
+
+
+<section class="insight-grid">
+
+{% for item in insights %}
+
+    <div class="insight-card">
+
+        <div class="insight-icon">
+            {{ item.icon }}
+        </div>
+
+
+        <div>
+
+            <span class="section-kicker">
+                FINORA INSIGHT
+            </span>
+
+            <h3>
+                {{ item.title }}
+            </h3>
+
+            <p>
+                {{ item.text }}
+            </p>
+
+        </div>
+
+    </div>
+
+{% endfor %}
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,83 @@
+
+{% extends "base.html" %}
+{% block title %}Budgets{% endblock %}
+{% block page_name %}Budgets{% endblock %}
+{% block content %}
+
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">SPEND WITH INTENTION</span>
+        <h1>Your budgets</h1>
+        <p class="muted">Set limits that keep your financial goals on track.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <h3>Set a monthly budget</h3>
+
+    <form method="POST" class="form-grid">
+        <div class="form-field">
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+                {% for c in categories %}
+                    <option value="{{ c }}">{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="amount">Limit (₹)</label>
+            <input id="amount" name="amount" type="number"
+                   min="0.01" step="0.01" required placeholder="3000">
+        </div>
+
+        <div class="field-full">
+            <button class="btn btn-primary" type="submit">
+                Save budget for {{ month }}
+            </button>
+        </div>
+    </form>
+</section>
+
+<div class="goal-grid">
+    {% for b in budgets %}
+        {% set pct = ((b.spent / b.amount * 100)|int) if b.amount > 0 else 0 %}
+        {% set display_pct = [pct, 100]|min %}
+
+        <article class="panel budget-card">
+            <div class="budget-card-top">
+                <span class="category-pill">{{ b.category }}</span>
+                <span class="muted">{{ b.month }}</span>
+            </div>
+
+            <h2>
+                ₹{{ "%.0f"|format(b.spent) }}
+                <small>/ ₹{{ "%.0f"|format(b.amount) }}</small>
+            </h2>
+
+            <div class="progress-track">
+                <div
+                    class="progress-fill{% if pct >= 100 %} progress-danger{% endif %}"
+                    style="--progress: {{ display_pct }}%;">
+                </div>
+            </div>
+
+            {% if b.spent > b.amount %}
+                <p class="warning-text">
+                    You are ₹{{ "%.0f"|format(b.spent - b.amount) }} over budget.
+                </p>
+            {% else %}
+                <p class="muted">
+                    ₹{{ "%.0f"|format(b.amount - b.spent) }} remaining · {{ pct }}% used
+                </p>
+            {% endif %}
+        </article>
+    {% else %}
+        <div class="panel empty-state">
+            <p>No budgets for this month yet. Create your first budget above.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,99 @@
+
+{% extends "base.html" %}
+{% block title %}Savings Goals{% endblock %}
+{% block page_name %}Savings Goals{% endblock %}
+{% block content %}
+
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">SMALL STEPS, BIG DREAMS</span>
+        <h1>Savings goals</h1>
+        <p class="muted">Give every dream a target and a plan.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <h3>Create a goal</h3>
+
+    <form method="POST" class="form-grid">
+        <div class="form-field">
+            <label for="goal-name">Goal name</label>
+            <input id="goal-name" name="name" maxlength="100"
+                   required placeholder="Emergency fund, laptop, trip...">
+        </div>
+
+        <div class="form-field">
+            <label for="goal-target">Target amount (₹)</label>
+            <input id="goal-target" name="target" type="number"
+                   min="0.01" step="0.01" required placeholder="50000">
+        </div>
+
+        <div class="form-field">
+            <label for="goal-saved">Already saved (₹)</label>
+            <input id="goal-saved" name="saved" type="number"
+                   min="0" step="0.01" value="0">
+        </div>
+
+        <div class="form-field">
+            <label for="goal-deadline">Target date (optional)</label>
+            <input id="goal-deadline" name="deadline" type="date">
+        </div>
+
+        <div class="field-full">
+            <button class="btn btn-primary" type="submit">＋ Create goal</button>
+        </div>
+    </form>
+</section>
+
+<div class="goal-grid">
+    {% for g in goals %}
+        {% set pct = [100, ((g.saved / g.target * 100)|int) if g.target > 0 else 0]|min %}
+        {% set remaining = [0, g.target - g.saved]|max %}
+
+        <article class="panel goal-card">
+            <div class="goal-illustration">◎</div>
+
+            <span class="eyebrow">SAVINGS GOAL</span>
+            <h3>{{ g.name }}</h3>
+
+            <p class="muted">
+                {{ 'Target: ' ~ g.deadline if g.deadline else 'One step closer to your dream' }}
+            </p>
+
+            <h2>
+                ₹{{ "%.0f"|format(g.saved) }}
+                <small>of ₹{{ "%.0f"|format(g.target) }}</small>
+            </h2>
+
+            <div class="progress-track">
+                <div class="progress-fill" style="--progress: {{ pct }}%;"></div>
+            </div>
+
+            <p class="muted">
+                {{ pct }}% completed · ₹{{ "%.0f"|format(remaining) }} to go
+            </p>
+
+            <form method="POST"
+                  action="{{ url_for('update_goal', goal_id=g.id) }}"
+                  class="goal-update">
+
+                <label for="saved-{{ g.id }}">Update saved amount</label>
+
+                <div class="inline-form">
+                    <input id="saved-{{ g.id }}" type="number" name="saved"
+                           min="0" step="0.01"
+                           value="{{ g.saved }}" required>
+
+                    <button class="btn btn-soft" type="submit">Update</button>
+                </div>
+            </form>
+        </article>
+    {% else %}
+        <div class="panel empty-state">
+            <p>Your first savings goal could start here.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+

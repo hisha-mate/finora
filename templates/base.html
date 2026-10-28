@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Finora{% endblock %} | Finora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+{% if session.get('user_id') %}
+<div class="app-layout">
+    <aside class="sidebar">
+        <a class="brand" href="{{ url_for('dashboard') }}">
+            <span class="brand-icon">f</span> finora<span class="brand-dot">.</span>
+        </a>
+        <p class="nav-label">WORKSPACE</p>
+        <nav class="nav-links">
+            <a href="{{ url_for('dashboard') }}">◫ <span>Dashboard</span></a>
+            <a href="{{ url_for('transactions') }}">↔ <span>Transactions</span></a>
+            <a href="{{ url_for('budgets') }}">▤ <span>Budgets</span></a>
+            <a href="{{ url_for('goals') }}">◎ <span>Savings Goals</span></a>
+            <a href="{{ url_for('analytics') }}">▥ <span>Analytics</span></a>
+            <a href="{{ url_for('pdf_analyzer') }}">▧ <span>PDF Analyzer</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="profile-avatar">{{ session.get('name', 'U')[0]|upper }}</div>
+            <div class="profile-info">
+                <strong>{{ session.get('name', 'User') }}</strong>
+                <small>Personal account</small>
+            </div>
+            <a class="logout-link" href="{{ url_for('logout') }}" title="Log out">↗</a>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <header class="topbar">
+            <span class="breadcrumb">Your finances / <strong>{% block page_name %}Overview{% endblock %}</strong></span>
+            <span class="topbar-date">{{ today if today is defined else '' }}</span>
+        </header>
+
+        <section class="page-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </section>
+        <footer class="footer">Made with care by Finora <span>·</span> Your money, understood.</footer>
+    </main>
+</div>
+{% else %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+    {% block auth_content %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

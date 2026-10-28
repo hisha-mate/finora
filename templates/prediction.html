@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}
+Prediction | Finora
+{% endblock %}
+
+{% block page_heading %}
+Expense prediction
+{% endblock %}
+
+
+{% block content %}
+
+<section class="prediction-card">
+
+
+    <div class="prediction-main">
+
+        <span class="section-kicker">
+            ESTIMATED NEXT PERIOD
+        </span>
+
+        <h2>
+            ₹{{ "{:,.2f}".format(predicted) }}
+        </h2>
+
+        <p>
+            Based on your recent expense records.
+        </p>
+
+    </div>
+
+
+    <div class="trend-box">
+
+        <span>
+            Current trend
+        </span>
+
+        <strong>
+            {{ trend }}
+        </strong>
+
+        <div class="trend-icon">
+
+            {% if trend == "Increasing" %}
+                ↗
+            {% elif trend == "Decreasing" %}
+                ↘
+            {% else %}
+                →
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <span class="section-kicker">
+        HOW IT WORKS
+    </span>
+
+    <h3>
+        Simple data-driven prediction
+    </h3>
+
+    <p class="long-text">
+
+        Finora uses your recent expense history to
+        estimate a typical upcoming expense level.
+        As you add more transactions, the estimate
+        becomes more meaningful for your personal
+        spending pattern.
+
+    </p>
+
+</section>
+
+{% endblock %}

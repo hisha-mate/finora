@@ -1,0 +1,48 @@
+
+{% extends "base.html" %}
+{% block title %}Transactions{% endblock %}
+{% block page_name %}Transactions{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div><span class="eyebrow">MONEY IN, MONEY OUT</span><h1>Transactions</h1><p class="muted">Every rupee has a story. Keep track of yours.</p></div>
+</div>
+
+<section class="panel form-panel">
+    <h3>Add a transaction</h3>
+    <form method="POST" class="form-grid">
+        <div class="form-field"><label>Type</label>
+            <select name="type" required><option value="expense">Expense</option><option value="income">Income</option></select>
+        </div>
+        <div class="form-field"><label>Amount (₹)</label><input name="amount" type="number" min="0.01" step="0.01" required placeholder="500"></div>
+        <div class="form-field"><label>Category</label>
+            <select name="category">{% for c in categories %}<option>{{ c }}</option>{% endfor %}</select>
+        </div>
+        <div class="form-field"><label>Date</label><input name="date" type="date" value="{{ today }}" required></div>
+        <div class="form-field field-full"><label>Description</label><input name="description" maxlength="200" placeholder="e.g. Lunch, monthly salary, bus pass"></div>
+        <div class="field-full"><button class="btn btn-primary" type="submit">＋ Save transaction</button></div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-heading"><div><h3>Transaction history</h3><p class="muted">{{ transactions|length }} recorded transactions</p></div></div>
+    {% if transactions %}
+    <div class="table-scroll"><table>
+        <thead><tr><th>Description</th><th>Category</th><th>Date</th><th>Amount</th><th>Action</th></tr></thead>
+        <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.description or t.category }}</td>
+            <td><span class="category-pill">{{ t.category }}</span></td>
+            <td>{{ t.date }}</td>
+            <td class="{{ 'amount-income' if t.type == 'income' else 'amount-expense' }}">{{ '+' if t.type == 'income' else '−' }}₹{{ "%.2f"|format(t.amount) }}</td>
+            <td><form method="POST" action="{{ url_for('delete_transaction', transaction_id=t.id) }}" onsubmit="return confirm('Delete this transaction?')"><button class="delete-btn" type="submit" aria-label="Delete transaction">Delete</button></form></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% else %}
+    <div class="empty-state"><span>↔</span><p>Your transaction history will appear here.</p></div>
+    {% endif %}
+</section>
+{% endblock %}
+

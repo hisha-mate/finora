@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}
+Savings Goals | Finora
+{% endblock %}
+
+{% block page_heading %}
+Savings Goals
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-intro">
+
+    <p>
+        Turn your plans into measurable goals and
+        track your progress toward achieving them.
+    </p>
+
+</div>
+
+
+<!-- =========================================
+     CREATE SAVINGS GOAL
+========================================= -->
+
+<section class="form-panel">
+
+    <div class="panel-heading">
+
+        <div>
+
+            <span class="section-kicker">
+                NEW GOAL
+            </span>
+
+            <h3>
+                Create a Savings Goal
+            </h3>
+
+        </div>
+
+    </div>
+
+
+    <form method="POST" class="form-grid">
+
+
+        <!-- GOAL NAME -->
+
+        <div class="field">
+
+            <label>
+                Goal Name
+            </label>
+
+            <input
+                type="text"
+                name="name"
+                placeholder="New laptop, trip, emergency fund"
+                required
+            >
+
+        </div>
+
+
+        <!-- TARGET -->
+
+        <div class="field">
+
+            <label>
+                Target Amount
+            </label>
+
+            <input
+                type="number"
+                name="target"
+                step="0.01"
+                min="1"
+                placeholder="₹ 50000"
+                required
+            >
+
+        </div>
+
+
+        <!-- SAVED -->
+
+        <div class="field">
+
+            <label>
+                Already Saved
+            </label>
+
+            <input
+                type="number"
+                name="saved"
+                step="0.01"
+                min="0"
+                value="0"
+            >
+
+        </div>
+
+
+        <!-- DEADLINE -->
+
+        <div class="field">
+
+            <label>
+                Deadline
+            </label>
+
+            <input
+                type="date"
+                name="deadline"
+            >
+
+        </div>
+
+
+        <!-- BUTTON -->
+
+        <div class="form-actions full">
+
+            <button
+                class="btn primary"
+                type="submit">
+
+                Create Goal →
+
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+<!-- =========================================
+     SAVINGS GOALS
+========================================= -->
+
+<section class="cards-grid">
+
+
+{% if goals %}
+
+
+    {% for goal in goals %}
+
+
+        {% set percentage =
+            (goal.saved / goal.target * 100)
+            if goal.target > 0
+            else 0
+        %}
+
+
+        {% if percentage > 100 %}
+
+            {% set percentage = 100 %}
+
+        {% endif %}
+
+
+        <div class="goal-card">
+
+
+            <!-- TOP -->
+
+            <div class="card-top">
+
+                <span class="goal-icon">
+                    ♡
+                </span>
+
+
+                <a
+                    class="delete-btn"
+
+                    href="{{ url_for(
+                        'delete_savings',
+                        goal_id=goal.id
+                    ) }}"
+
+                    onclick="return confirm('Delete this goal?')">
+
+                    Delete
+
+                </a>
+
+            </div>
+
+
+            <!-- NAME -->
+
+            <h3>
+                {{ goal.name }}
+            </h3>
+
+
+            <!-- TARGET -->
+
+            <p class="muted">
+
+                Target:
+                ₹{{ "{:,.2f}".format(goal.target) }}
+
+            </p>
+
+
+            <!-- PROGRESS -->
+
+            <div
+                class="progress large"
+                data-progress="{{ percentage }}"
+            >
+
+                <span class="progress-fill"></span>
+
+            </div>
+
+
+            <!-- META -->
+
+            <div class="goal-meta">
+
+                <strong>
+
+                    ₹{{ "{:,.2f}".format(goal.saved) }}
+
+                    saved
+
+                </strong>
+
+
+                <span>
+
+                    {{ "{:.0f}".format(percentage) }}%
+
+                </span>
+
+            </div>
+
+
+            <!-- DEADLINE -->
+
+            {% if goal.deadline %}
+
+                <small>
+
+                    Deadline:
+                    {{ goal.deadline }}
+
+                </small>
+
+            {% endif %}
+
+
+        </div>
+
+
+    {% endfor %}
+
+
+{% else %}
+
+
+    <div class="empty-state full-span">
+
+        No savings goals yet.
+
+        Create your first goal above.
+
+    </div>
+
+
+{% endif %}
+
+
+</section>
+
+
+<!-- =========================================
+     PROGRESS BAR JAVASCRIPT
+========================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const progressBars =
+            document.querySelectorAll(
+                ".progress[data-progress]"
+            );
+
+
+        progressBars.forEach(
+            function (bar) {
+
+                const percentage =
+                    bar.dataset.progress;
+
+
+                const fill =
+                    bar.querySelector(
+                        ".progress-fill"
+                    );
+
+
+                if (fill) {
+
+                    fill.style.width =
+                        percentage + "%";
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+
+{% endblock %}
